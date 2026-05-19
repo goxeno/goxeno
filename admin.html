@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GO XENO — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --red: #cc0000;
+  --red2: #ff2222;
+  --black: #080808;
+  --dark: #0f0f0f;
+  --dark2: #161616;
+  --dark3: #1e1e1e;
+  --border: #2a2a2a;
+  --text: #e8e8e8;
+  --muted: #666;
+  --green: #22c55e;
+  --yellow: #f59e0b;
+}
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  min-height: 100vh;
+}
+
+/* ── LOGIN ── */
+.login-screen {
+  position: fixed; inset: 0;
+  background: var(--black);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  flex-direction: column; gap: 32px;
+}
+.login-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; letter-spacing: 8px; font-weight: 300;
+  color: #fff;
+}
+.login-logo b { color: var(--red); }
+.login-box {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  padding: 40px;
+  width: 100%; max-width: 360px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.login-box h3 {
+  font-size: 10px; letter-spacing: 4px;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.login-box input {
+  width: 100%; padding: 14px 16px;
+  background: var(--dark3); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Montserrat', sans-serif;
+  font-size: 14px; outline: none;
+  transition: border-color .3s;
+}
+.login-box input:focus { border-color: var(--red); }
+.login-btn {
+  width: 100%; padding: 14px;
+  background: var(--red); border: none;
+  color: #fff; font-family: 'Montserrat', sans-serif;
+  font-size: 11px; font-weight: 500; letter-spacing: 4px;
+  text-transform: uppercase; cursor: pointer;
+  transition: background .3s;
+}
+.login-btn:hover { background: var(--red2); }
+.login-error {
+  color: var(--red); font-size: 11px; letter-spacing: 1px;
+  text-align: center; display: none;
+}
+
+/* ── LAYOUT ── */
+.admin-wrap { display: none; min-height: 100vh; }
+.admin-wrap.visible { display: flex; }
+
+/* Sidebar */
+.sidebar {
+  width: 220px; min-height: 100vh;
+  background: var(--dark);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+.sidebar-logo {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; letter-spacing: 5px; font-weight: 300;
+}
+.sidebar-logo b { color: var(--red); }
+.sidebar-label {
+  font-size: 8px; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase;
+  padding: 20px 20px 8px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 20px;
+  color: var(--muted); cursor: pointer;
+  transition: all .2s; border-left: 2px solid transparent;
+  font-size: 12px; letter-spacing: 1px;
+}
+.nav-item:hover { color: var(--text); background: var(--dark2); }
+.nav-item.active { color: var(--red); border-left-color: var(--red); background: rgba(204,0,0,0.05); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.sidebar-footer {
+  margin-top: auto; padding: 20px;
+  border-top: 1px solid var(--border);
+}
+.logout-btn {
+  width: 100%; padding: 10px;
+  background: none; border: 1px solid var(--border);
+  color: var(--muted); font-family: 'Montserrat', sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all .3s;
+}
+.logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* Main content */
+.main {
+  margin-left: 220px;
+  flex: 1; padding: 32px;
+  min-height: 100vh;
+}
+.page { display: none; }
+.page.active { display: block; }
+
+/* Page header */
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px; padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 300; letter-spacing: 2px;
+}
+.page-sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-top: 4px; }
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px; font-weight: 500; letter-spacing: 3px;
+  text-transform: uppercase; cursor: pointer; border: none;
+  transition: all .2s;
+}
+.btn-red { background: var(--red); color: #fff; }
+.btn-red:hover { background: var(--red2); }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover { border-color: var(--red); color: var(--red); }
+.btn-green { background: var(--green); color: #000; }
+.btn-sm { padding: 6px 14px; font-size: 9px; }
+
+/* Cards */
+.card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  padding: 24px; margin-bottom: 20px;
+}
+.card-title {
+  font-size: 10px; letter-spacing: 3px;
+  color: var(--red); text-transform: uppercase; margin-bottom: 20px;
+}
+
+/* Form fields */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block; font-size: 9px; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 6px;
+}
+.field input, .field select, .field textarea {
+  width: 100%; padding: 10px 14px;
+  background: var(--dark3); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Montserrat', sans-serif;
+  font-size: 13px; outline: none; transition: border-color .2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--red);
+}
+.field select option { background: var(--dark3); }
+.field textarea { resize: vertical; min-height: 80px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* Color picker */
+.color-field { display: flex; align-items: center; gap: 12px; }
+.color-field input[type=color] {
+  width: 48px; height: 36px; padding: 2px;
+  border: 1px solid var(--border); cursor: pointer;
+  background: var(--dark3);
+}
+.color-field input[type=text] { flex: 1; }
+
+/* Image upload */
+.img-upload {
+  border: 1px dashed var(--border);
+  padding: 24px; text-align: center;
+  cursor: pointer; transition: border-color .3s; position: relative;
+  background: var(--dark3);
+}
+.img-upload:hover { border-color: var(--red); }
+.img-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.img-upload-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.4; }
+.img-upload-text { font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.img-preview { max-width: 100%; max-height: 160px; object-fit: cover; margin-top: 12px; display: none; }
+
+/* Product list */
+.product-list { display: flex; flex-direction: column; gap: 2px; }
+.product-row {
+  display: grid;
+  grid-template-columns: 48px 1fr 100px 80px 80px 80px 120px;
+  align-items: center; gap: 12px;
+  background: var(--dark2); padding: 12px 16px;
+  border: 1px solid var(--border);
+  transition: border-color .2s;
+}
+.product-row:hover { border-color: #333; }
+.product-row-img {
+  width: 48px; height: 60px;
+  background: var(--dark3); display: flex;
+  align-items: center; justify-content: center;
+  font-size: 20px; overflow: hidden;
+}
+.product-row-img img { width: 100%; height: 100%; object-fit: cover; }
+.product-row-name { font-size: 13px; color: var(--text); }
+.product-row-cat { font-size: 10px; color: var(--muted); margin-top: 2px; letter-spacing: 1px; }
+.product-row-price { color: var(--red); font-size: 13px; }
+.stock-badge {
+  padding: 3px 8px; font-size: 9px; letter-spacing: 1px;
+  text-transform: uppercase; text-align: center;
+}
+.stock-ok { background: rgba(34,197,94,0.15); color: var(--green); }
+.stock-low { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.stock-out { background: rgba(204,0,0,0.15); color: var(--red); }
+.product-actions { display: flex; gap: 6px; }
+
+/* Stats grid */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 2px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--dark2); border: 1px solid var(--border);
+  padding: 20px; text-align: center;
+}
+.stat-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; font-weight: 300; color: var(--red);
+}
+.stat-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+
+/* Toggle */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 12px; color: var(--text); }
+.toggle-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.toggle {
+  width: 44px; height: 24px; background: var(--border);
+  border-radius: 12px; position: relative; cursor: pointer;
+  transition: background .3s;
+}
+.toggle.on { background: var(--red); }
+.toggle::after {
+  content: ''; position: absolute;
+  width: 18px; height: 18px; background: #fff;
+  border-radius: 50%; top: 3px; left: 3px;
+  transition: left .3s;
+}
+.toggle.on::after { left: 23px; }
+
+/* Code output */
+.code-box {
+  background: #050505; border: 1px solid var(--border);
+  padding: 16px; font-family: monospace; font-size: 11px;
+  color: #888; line-height: 1.6; overflow-x: auto;
+  max-height: 200px; overflow-y: auto;
+}
+
+/* Save bar */
+.save-bar {
+  position: fixed; bottom: 0; left: 220px; right: 0;
+  background: var(--dark); border-top: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 50; transform: translateY(100%);
+  transition: transform .3s;
+}
+.save-bar.visible { transform: translateY(0); }
+.save-bar-text { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+/* Alert */
+.alert {
+  padding: 12px 16px; margin-bottom: 16px;
+  font-size: 12px; letter-spacing: 1px; display: none;
+}
+.alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
+.alert-error { background: rgba(204,0,0,0.1); border: 1px solid rgba(204,0,0,0.3); color: var(--red); }
+
+/* Modal */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-bg.open { display: flex; }
+.modal-box {
+  background: var(--dark2); border: 1px solid var(--border);
+  width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+  padding: 32px;
+}
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 300; margin-bottom: 24px;
+}
+.modal-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+
+/* Instructions box */
+.instructions {
+  background: rgba(204,0,0,0.05); border: 1px solid rgba(204,0,0,0.2);
+  padding: 16px; margin-bottom: 24px;
+}
+.instructions p { font-size: 12px; color: var(--muted); line-height: 1.8; }
+.instructions strong { color: var(--text); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar { width: 100%; min-height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
+  .main { margin-left: 0; padding: 16px; }
+  .admin-wrap { flex-direction: column; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .product-row { grid-template-columns: 40px 1fr 80px; }
+  .product-row > *:nth-child(n+4) { display: none; }
+  .save-bar { left: 0; }
+  .field-row, .field-row3 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">GO <b>XENO</b></div>
+  <div class="login-box">
+    <h3>Admin Access</h3>
+    <input type="text" id="loginUser" placeholder="Username" autocomplete="off">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button class="login-btn" onclick="doLogin()">Enter Panel</button>
+    <div class="login-error" id="loginError">Incorrect credentials</div>
+  </div>
+  <div style="font-size:10px;color:var(--muted);letter-spacing:2px;">GO XENO © 2026</div>
+</div>
+
+<!-- ── ADMIN PANEL ── -->
+<div class="admin-wrap" id="adminWrap">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">GO <b>XENO</b></div>
+
+    <div class="sidebar-label">Dashboard</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+      <span class="nav-icon">📊</span> Overview
+    </div>
+
+    <div class="sidebar-label">Content</div>
+    <div class="nav-item" onclick="showPage('homepage', this)">
+      <span class="nav-icon">🏠</span> Homepage
+    </div>
+    <div class="nav-item" onclick="showPage('products', this)">
+      <span class="nav-icon">👔</span> Products
+    </div>
+    <div class="nav-item" onclick="showPage('media', this)">
+      <span class="nav-icon">🖼️</span> Photos & Videos
+    </div>
+
+    <div class="sidebar-label">Design</div>
+    <div class="nav-item" onclick="showPage('colors', this)">
+      <span class="nav-icon">🎨</span> Colors & Theme
+    </div>
+    <div class="nav-item" onclick="showPage('text', this)">
+      <span class="nav-icon">✏️</span> Text & Labels
+    </div>
+
+    <div class="sidebar-label">Store</div>
+    <div class="nav-item" onclick="showPage('settings', this)">
+      <span class="nav-icon">⚙️</span> Settings
+    </div>
+    <div class="nav-item" onclick="showPage('export', this)">
+      <span class="nav-icon">💾</span> Save & Export
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">← Logout</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Welcome back, Go Xeno Admin</div>
+        </div>
+        <a href="index.html" target="_blank" class="btn btn-outline">View Live Site ↗</a>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="dash-products">8</div>
+          <div class="stat-label">Products</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="dash-instock">6</div>
+          <div class="stat-label">In Stock</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="dash-sold">657</div>
+          <div class="stat-label">Total Sold</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="dash-lowstock">2</div>
+          <div class="stat-label">Low Stock</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Quick Actions</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-red" onclick="showPage('products', document.querySelector('[onclick*=products]'))">+ Add Product</button>
+          <button class="btn btn-outline" onclick="showPage('homepage', document.querySelector('[onclick*=homepage]'))">Edit Homepage</button>
+          <button class="btn btn-outline" onclick="showPage('colors', document.querySelector('[onclick*=colors]'))">Change Colors</button>
+          <button class="btn btn-outline" onclick="showPage('export', document.querySelector('[onclick*=export]'))">Export Files</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Stock Alert</div>
+        <div id="stockAlerts"></div>
+      </div>
+    </div>
+
+    <!-- ── HOMEPAGE EDITOR ── -->
+    <div class="page" id="page-homepage">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Homepage Editor</div>
+          <div class="page-sub">Edit index.html content</div>
+        </div>
+      </div>
+
+      <div class="instructions">
+        <p>✏️ Edit the fields below, then go to <strong>Save & Export</strong> to download your updated files and push them to GitHub.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Hero Section</div>
+        <div class="field">
+          <label>Top Label (small text above title)</label>
+          <input type="text" id="hp-eyebrow" value="SS 2026 — New Collection">
+        </div>
+        <div class="field">
+          <label>Main Title Line 1</label>
+          <input type="text" id="hp-title1" value="GO">
+        </div>
+        <div class="field">
+          <label>Main Title Line 2 (shows in red italic)</label>
+          <input type="text" id="hp-title2" value="XENO">
+        </div>
+        <div class="field">
+          <label>Subtitle</label>
+          <input type="text" id="hp-subtitle" value="Luxury Menswear & Womenswear">
+        </div>
+        <div class="field">
+          <label>Shop Now Button Text</label>
+          <input type="text" id="hp-btntext" value="Shop Now">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Marquee / Scrolling Text</div>
+        <div class="field"><label>Item 1</label><input type="text" id="mq1" value="New Arrivals 2026"></div>
+        <div class="field"><label>Item 2</label><input type="text" id="mq2" value="Free Shipping Over ₹3000"></div>
+        <div class="field"><label>Item 3</label><input type="text" id="mq3" value="Premium Quality"></div>
+        <div class="field"><label>Item 4</label><input type="text" id="mq4" value="Men & Women"></div>
+        <div class="field"><label>Item 5</label><input type="text" id="mq5" value="Limited Edition"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Brand Numbers Strip</div>
+        <div class="field-row3">
+          <div class="field"><label>Number 1</label><input type="text" id="bn1num" value="500+"></div>
+          <div class="field"><label>Number 2</label><input type="text" id="bn2num" value="10K+"></div>
+          <div class="field"><label>Number 3</label><input type="text" id="bn3num" value="100%"></div>
+        </div>
+        <div class="field-row3">
+          <div class="field"><label>Label 1</label><input type="text" id="bn1lbl" value="Products"></div>
+          <div class="field"><label>Label 2</label><input type="text" id="bn2lbl" value="Happy Customers"></div>
+          <div class="field"><label>Label 3</label><input type="text" id="bn3lbl" value="Premium Quality"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Footer</div>
+        <div class="field"><label>Footer Tagline</label><input type="text" id="ft-sub" value="Luxury Menswear & Womenswear"></div>
+        <div class="field"><label>Copyright Text</label><input type="text" id="ft-copy" value="© 2026 Go Xeno. All rights reserved."></div>
+      </div>
+
+      <button class="btn btn-red" onclick="saveHomepage()">Save Homepage Changes</button>
+      <div class="alert alert-success" id="hp-alert" style="margin-top:12px;">✓ Saved! Go to Export to download.</div>
+    </div>
+
+    <!-- ── PRODUCTS ── -->
+    <div class="page" id="page-products">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Products</div>
+          <div class="page-sub">Manage your store products</div>
+        </div>
+        <button class="btn btn-red" onclick="openAddProduct()">+ Add Product</button>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;">
+          <span style="font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;">All Products</span>
+          <span id="prod-count" style="font-size:10px;color:var(--red);margin-left:auto;"></span>
+        </div>
+        <div class="product-list" id="productList"></div>
+      </div>
+    </div>
+
+    <!-- ── MEDIA ── -->
+    <div class="page" id="page-media">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Photos & Videos</div>
+          <div class="page-sub">Upload and manage your media</div>
+        </div>
+      </div>
+
+      <div class="instructions">
+        <p>📌 <strong>How to add photos to your live site:</strong><br>
+        1. Upload your photo/video here to see it named correctly<br>
+        2. Put that file in your <strong>goxeno folder</strong> in Termux<br>
+        3. Set the filename in your HTML (e.g. <code>src="photo1.jpg"</code>)<br>
+        4. Run <strong>git add . → git commit → git push</strong></p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Hero Background (index.html)</div>
+        <div class="img-upload" id="heroUpload">
+          <input type="file" accept="image/*,video/*" onchange="previewMedia(this,'heroPreview','heroUpload')">
+          <div class="img-upload-icon">🖼️</div>
+          <div class="img-upload-text">Upload Hero Photo or Video</div>
+          <img id="heroPreview" class="img-preview">
+        </div>
+        <div class="field" style="margin-top:12px;">
+          <label>Filename to use in HTML</label>
+          <input type="text" id="heroFilename" placeholder="e.g. hero-bg.jpg" readonly>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Homepage Gallery Photos (6 slots)</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="gallerySlots">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Lookbook Photos</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <div>
+            <div class="img-upload">
+              <input type="file" accept="image/*" onchange="previewMedia(this,'lb1','lb1up')">
+              <div class="img-upload-icon">📸</div>
+              <div class="img-upload-text">Main Feature</div>
+              <img id="lb1" class="img-preview">
+            </div>
+            <div style="font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">look1.jpg</div>
+          </div>
+          <div>
+            <div class="img-upload">
+              <input type="file" accept="image/*" onchange="previewMedia(this,'lb2','lb2up')">
+              <div class="img-upload-icon">📸</div>
+              <div class="img-upload-text">Look 2</div>
+              <img id="lb2" class="img-preview">
+            </div>
+            <div style="font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">look2.jpg</div>
+          </div>
+          <div>
+            <div class="img-upload">
+              <input type="file" accept="image/*" onchange="previewMedia(this,'lb3','lb3up')">
+              <div class="img-upload-icon">📸</div>
+              <div class="img-upload-text">Look 3</div>
+              <img id="lb3" class="img-preview">
+            </div>
+            <div style="font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">look3.jpg</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Brand Video</div>
+        <div class="img-upload">
+          <input type="file" accept="video/*" onchange="previewMedia(this,'vidPreview','vidUp')">
+          <div class="img-upload-icon">🎬</div>
+          <div class="img-upload-text">Upload Brand Video (MP4)</div>
+          <img id="vidPreview" class="img-preview">
+        </div>
+        <div class="field" style="margin-top:12px;">
+          <label>Filename to use in HTML</label>
+          <input type="text" placeholder="e.g. brand-video.mp4" readonly id="vidFilename">
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COLORS ── -->
+    <div class="page" id="page-colors">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Colors & Theme</div>
+          <div class="page-sub">Change colors across your entire site</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Main Colors</div>
+        <div class="field">
+          <label>Primary Accent Color (currently red)</label>
+          <div class="color-field">
+            <input type="color" id="color-primary" value="#cc0000" oninput="syncColor('color-primary','color-primary-hex')">
+            <input type="text" id="color-primary-hex" value="#cc0000" oninput="syncHex('color-primary-hex','color-primary')">
+          </div>
+        </div>
+        <div class="field">
+          <label>Background Color</label>
+          <div class="color-field">
+            <input type="color" id="color-bg" value="#080808" oninput="syncColor('color-bg','color-bg-hex')">
+            <input type="text" id="color-bg-hex" value="#080808" oninput="syncHex('color-bg-hex','color-bg')">
+          </div>
+        </div>
+        <div class="field">
+          <label>Text Color</label>
+          <div class="color-field">
+            <input type="color" id="color-text" value="#e8e8e8" oninput="syncColor('color-text','color-text-hex')">
+            <input type="text" id="color-text-hex" value="#e8e8e8" oninput="syncHex('color-text-hex','color-text')">
+          </div>
+        </div>
+        <div class="field">
+          <label>Card/Panel Background</label>
+          <div class="color-field">
+            <input type="color" id="color-card" value="#111111" oninput="syncColor('color-card','color-card-hex')">
+            <input type="text" id="color-card-hex" value="#111111" oninput="syncHex('color-card-hex','color-card')">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Preview</div>
+        <div id="colorPreview" style="padding:24px;border:1px solid #1a1a1a;background:#080808;text-align:center;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#fff;letter-spacing:4px;">GO <span id="prev-accent" style="color:#cc0000;">XENO</span></div>
+          <div style="font-size:11px;letter-spacing:3px;color:#666;margin:8px 0;">LUXURY FASHION</div>
+          <div style="display:inline-block;padding:10px 28px;background:#cc0000;color:#fff;font-size:10px;letter-spacing:3px;margin-top:12px;" id="prev-btn">SHOP NOW</div>
+        </div>
+      </div>
+
+      <button class="btn btn-red" onclick="saveColors()">Save Color Changes</button>
+      <div class="alert alert-success" id="color-alert" style="margin-top:12px;">✓ Colors saved! Go to Export to download.</div>
+    </div>
+
+    <!-- ── TEXT EDITOR ── -->
+    <div class="page" id="page-text">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Text & Labels</div>
+          <div class="page-sub">Edit all text on your store page</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Store Page — Navigation</div>
+        <div class="field"><label>Store Section Title (New Arrivals)</label><input type="text" id="st-newtitle" value="New Arrivals"></div>
+        <div class="field"><label>Men's Section Title</label><input type="text" id="st-mentitle" value="Men's Edit"></div>
+        <div class="field"><label>Women's Section Title</label><input type="text" id="st-womentitle" value="Women's Edit"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Store Page — Hero Text</div>
+        <div class="field"><label>Hero Collection Label</label><input type="text" id="st-herotag" value="SS 2026 Collection"></div>
+        <div class="field"><label>Hero Title Line 1</label><input type="text" id="st-hero1" value="Wear the"></div>
+        <div class="field"><label>Hero Title Line 2 (red italic)</label><input type="text" id="st-hero2" value="Xeno"></div>
+        <div class="field"><label>Hero Title Line 3</label><input type="text" id="st-hero3" value="Standard"></div>
+        <div class="field"><label>Hero Subtitle</label><input type="text" id="st-herosub" value="Luxury menswear & womenswear — crafted for those who define their own era"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">WhatsApp Number (for orders)</div>
+        <div class="field">
+          <label>Your WhatsApp Number (with country code, no +)</label>
+          <input type="text" id="wa-number" placeholder="e.g. 919876543210">
+        </div>
+        <p style="font-size:11px;color:var(--muted);">India: start with 91 then your 10-digit number</p>
+      </div>
+
+      <button class="btn btn-red" onclick="saveText()">Save Text Changes</button>
+      <div class="alert alert-success" id="text-alert" style="margin-top:12px;">✓ Text saved! Go to Export to download.</div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Store preferences</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Store Features</div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Shopping Cart</div><div class="toggle-sub">Show cart icon and cart drawer</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">WhatsApp Order Button</div><div class="toggle-sub">Show WhatsApp order option</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Stock Display</div><div class="toggle-sub">Show stock numbers on products</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Sold Count Display</div><div class="toggle-sub">Show how many units sold</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Custom Cursor</div><div class="toggle-sub">Red dot cursor (desktop only)</div></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Change Admin Password</div>
+        <div class="field"><label>New Username</label><input type="text" id="new-user" placeholder="New username"></div>
+        <div class="field"><label>New Password</label><input type="password" id="new-pass" placeholder="New password"></div>
+        <button class="btn btn-outline btn-sm" onclick="changePassword()">Update Password</button>
+        <div class="alert alert-success" id="pass-alert" style="margin-top:10px;">✓ Password updated!</div>
+      </div>
+    </div>
+
+    <!-- ── EXPORT ── -->
+    <div class="page" id="page-export">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Save & Export</div>
+          <div class="page-sub">Download your updated files</div>
+        </div>
+      </div>
+
+      <div class="instructions">
+        <p>
+          <strong>How to publish your changes:</strong><br>
+          1. Click the download buttons below to get your updated files<br>
+          2. Move the downloaded files into your <strong>~/goxeno</strong> folder (replace old ones)<br>
+          3. Open Termux and run these commands:
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Termux Commands to Publish</div>
+        <div class="code-box">cd ~/goxeno
+git add .
+git commit -m "update site"
+git push</div>
+        <p style="font-size:11px;color:var(--muted);margin-top:12px;">Your live site updates automatically in ~30 seconds after pushing.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Download Files</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--dark3);border:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;">index.html</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">Homepage — with your text edits</div>
+            </div>
+            <button class="btn btn-red btn-sm" onclick="downloadIndex()">Download</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--dark3);border:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;">store.html</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">Store — with your product & color edits</div>
+            </div>
+            <button class="btn btn-red btn-sm" onclick="downloadStore()">Download</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Changes Made This Session</div>
+        <div id="changeLog" style="font-size:12px;color:var(--muted);line-height:2;">No changes yet.</div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+</div><!-- end admin wrap -->
+
+<!-- Product Modal -->
+<div class="modal-bg" id="productModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Add Product</div>
+    <div class="field-row">
+      <div class="field"><label>Product Name</label><input type="text" id="p-name" placeholder="e.g. Black Oversized Tee"></div>
+      <div class="field"><label>Price (with ₹)</label><input type="text" id="p-price" placeholder="e.g. ₹1,999"></div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Category</label>
+        <select id="p-cat">
+          <option value="tops">Tops</option>
+          <option value="bottoms">Bottoms</option>
+          <option value="outerwear">Outerwear</option>
+          <option value="accessories">Accessories</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <select id="p-gender">
+          <option value="men">Men</option>
+          <option value="women">Women</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Stock (units left)</label><input type="number" id="p-stock" placeholder="e.g. 20" min="0"></div>
+      <div class="field"><label>Units Sold</label><input type="number" id="p-sold" placeholder="e.g. 50" min="0"></div>
+    </div>
+    <div class="field">
+      <label>Badge</label>
+      <select id="p-badge">
+        <option value="">None</option>
+        <option value="new">New</option>
+        <option value="low">Almost Gone</option>
+        <option value="sold">Sold Out</option>
+      </select>
+    </div>
+    <div class="field"><label>Description</label><textarea id="p-desc" placeholder="Describe this product..."></textarea></div>
+
+    <div class="field">
+      <label>Product Photo</label>
+      <div style="display:flex;gap:16px;align-items:flex-start;">
+        <div style="flex:1;">
+          <div class="img-upload" id="p-photo-upload">
+            <input type="file" accept="image/*" onchange="previewProductPhoto(this)">
+            <div class="img-upload-icon" id="p-photo-icon">📷</div>
+            <div class="img-upload-text" id="p-photo-text">Tap to upload photo</div>
+          </div>
+        </div>
+        <div style="width:100px;flex-shrink:0;">
+          <div style="width:100px;height:130px;background:var(--dark3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;" id="p-photo-preview-wrap">
+            <img id="p-photo-preview" style="width:100%;height:100%;object-fit:cover;display:none;">
+            <span id="p-photo-placeholder" style="font-size:28px;">👔</span>
+          </div>
+          <div style="font-size:9px;color:var(--muted);margin-top:4px;text-align:center;" id="p-photo-filename">No photo</div>
+        </div>
+      </div>
+      <input type="hidden" id="p-photo-data">
+      <input type="hidden" id="p-photo-name">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
+      <button class="btn btn-red" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+let adminData = {
+  user: localStorage.getItem('gx-user') || 'admin',
+  pass: localStorage.getItem('gx-pass') || 'goxeno2026',
+  products: JSON.parse(localStorage.getItem('gx-products') || 'null') || [
+    { id:1, name:'Obsidian Oversized Tee', category:'tops', gender:'men', price:'₹1,899', stock:12, sold:88, badge:'new', desc:'Premium heavyweight cotton, dropped shoulders, washed black finish.' },
+    { id:2, name:'Silk Drape Dress', category:'tops', gender:'women', price:'₹4,299', stock:5, sold:45, badge:'low', desc:'Fluid silk-touch fabric, plunging neckline, side slit.' },
+    { id:3, name:'Structured Wide Trousers', category:'bottoms', gender:'men', price:'₹3,199', stock:0, sold:120, badge:'sold', desc:'Italian wool blend. Pleated front. Tapered hem.' },
+    { id:4, name:'Noir Biker Jacket', category:'outerwear', gender:'men', price:'₹8,999', stock:7, sold:33, badge:'', desc:'Genuine leather, asymmetric zip, quilted lining.' },
+    { id:5, name:'Gold Label Crop Top', category:'tops', gender:'women', price:'₹1,499', stock:20, sold:200, badge:'new', desc:'Ribbed stretch fabric. Gold embossed XENO logo.' },
+    { id:6, name:'Velvet Blazer', category:'outerwear', gender:'women', price:'₹6,499', stock:3, sold:27, badge:'low', desc:'Midnight velvet, peak lapel, single button.' },
+    { id:7, name:'Raw Denim Selvedge', category:'bottoms', gender:'men', price:'₹4,799', stock:15, sold:65, badge:'', desc:'14oz Japanese selvedge denim, slim tapered.' },
+    { id:8, name:'Linen Wide Trousers', category:'bottoms', gender:'women', price:'₹2,699', stock:18, sold:79, badge:'new', desc:'Breathable linen-blend. High waist. Relaxed leg.' },
+  ],
+  colors: JSON.parse(localStorage.getItem('gx-colors') || '{}'),
+  homepage: JSON.parse(localStorage.getItem('gx-homepage') || '{}'),
+  changelog: []
+};
+let editingProductId = null;
+
+// ── LOGIN ──
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  if (u === adminData.user && p === adminData.pass) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminWrap').classList.add('visible');
+    renderAll();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function logout() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminWrap').classList.remove('visible');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+// ── NAVIGATION ──
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  renderDashboard();
+  renderProducts();
+  renderGallerySlots();
+  loadHomepageFields();
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const p = adminData.products;
+  document.getElementById('dash-products').textContent = p.length;
+  document.getElementById('dash-instock').textContent = p.filter(x=>x.stock>0).length;
+  document.getElementById('dash-sold').textContent = p.reduce((s,x)=>s+x.sold,0);
+  document.getElementById('dash-lowstock').textContent = p.filter(x=>x.stock>0&&x.stock<=5).length;
+  const alerts = p.filter(x=>x.stock<=5);
+  document.getElementById('stockAlerts').innerHTML = alerts.length === 0
+    ? '<div style="color:var(--green);font-size:12px;">✓ All products have healthy stock</div>'
+    : alerts.map(x=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span style="font-size:12px;">${x.name}</span>
+          <span class="stock-badge ${x.stock===0?'stock-out':'stock-low'}">${x.stock===0?'Sold Out':x.stock+' left'}</span>
+        </div>`).join('');
+}
+
+// ── PRODUCTS ──
+function renderProducts() {
+  const list = document.getElementById('productList');
+  document.getElementById('prod-count').textContent = adminData.products.length + ' products';
+  list.innerHTML = adminData.products.map(p => {
+    const sc = p.stock===0?'stock-out':p.stock<=5?'stock-low':'stock-ok';
+    const sl = p.stock===0?'Sold Out':p.stock<=5?p.stock+' left':p.stock+' in stock';
+    return `
+    <div class="product-row">
+    <div class="product-row-img">${p.photo ? `<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;">` : (p.gender==='women'?'👗':'👔')}</div>
+      <div>
+        <div class="product-row-name">${p.name}</div>
+        <div class="product-row-cat">${p.category} · ${p.gender}</div>
+      </div>
+      <div class="product-row-price">${p.price}</div>
+      <div class="stock-badge ${sc}">${sl}</div>
+      <div style="font-size:11px;color:var(--muted);">${p.sold} sold</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">${p.badge||'—'}</div>
+      <div class="product-actions">
+        <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">Edit</button>
+        <button class="btn btn-sm" style="background:rgba(204,0,0,0.15);color:var(--red);border:1px solid rgba(204,0,0,0.3);" onclick="deleteProduct(${p.id})">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddProduct() {
+  editingProductId = null;
+  document.getElementById('modal-title').textContent = 'Add New Product';
+  ['p-name','p-price','p-stock','p-sold','p-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-badge').value='';
+  document.getElementById('p-cat').value='tops';
+  document.getElementById('p-gender').value='men';
+  document.getElementById('p-photo-placeholder').textContent = '👔';
+  clearPhotoFields();
+  document.getElementById('productModal').classList.add('open');
+}
+
+function editProduct(id) {
+  const p = adminData.products.find(x=>x.id===id);
+  if(!p) return;
+  editingProductId = id;
+  document.getElementById('modal-title').textContent = 'Edit Product';
+  document.getElementById('p-name').value = p.name;
+  document.getElementById('p-price').value = p.price;
+  document.getElementById('p-stock').value = p.stock;
+  document.getElementById('p-sold').value = p.sold;
+  document.getElementById('p-desc').value = p.desc;
+  document.getElementById('p-badge').value = p.badge;
+  document.getElementById('p-cat').value = p.category;
+  document.getElementById('p-gender').value = p.gender;
+  // Load existing photo if any
+  clearPhotoFields();
+  if (p.photo) {
+    document.getElementById('p-photo-data').value = p.photo;
+    document.getElementById('p-photo-name').value = p.photoName || 'photo';
+    document.getElementById('p-photo-preview').src = p.photo;
+    document.getElementById('p-photo-preview').style.display = 'block';
+    document.getElementById('p-photo-placeholder').style.display = 'none';
+    document.getElementById('p-photo-filename').textContent = p.photoName || 'existing photo';
+    document.getElementById('p-photo-text').textContent = '✓ Photo loaded';
+  } else {
+    document.getElementById('p-photo-placeholder').textContent = p.gender==='women'?'👗':'👔';
+  }
+  document.getElementById('productModal').classList.add('open');
+}
+
+function saveProduct() {
+  const name = document.getElementById('p-name').value.trim();
+  const price = document.getElementById('p-price').value.trim();
+  if(!name||!price) { alert('Please fill name and price'); return; }
+  const prod = {
+    name, price,
+    category: document.getElementById('p-cat').value,
+    gender: document.getElementById('p-gender').value,
+    stock: parseInt(document.getElementById('p-stock').value)||0,
+    sold: parseInt(document.getElementById('p-sold').value)||0,
+    badge: document.getElementById('p-badge').value,
+    desc: document.getElementById('p-desc').value.trim(),
+    photo: document.getElementById('p-photo-data').value || null,
+    photoName: document.getElementById('p-photo-name').value || null,
+  };
+  if(editingProductId) {
+    const i = adminData.products.findIndex(x=>x.id===editingProductId);
+    prod.id = editingProductId;
+    adminData.products[i] = prod;
+    logChange('Edited product: '+name);
+  } else {
+    prod.id = Date.now();
+    adminData.products.push(prod);
+    logChange('Added product: '+name);
+  }
+  saveProductsData();
+  renderProducts();
+  renderDashboard();
+  closeProductModal();
+}
+
+function deleteProduct(id) {
+  const p = adminData.products.find(x=>x.id===id);
+  if(!confirm('Delete "'+p.name+'"?')) return;
+  adminData.products = adminData.products.filter(x=>x.id!==id);
+  saveProductsData();
+  renderProducts();
+  renderDashboard();
+  logChange('Deleted product: '+p.name);
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.remove('open');
+}
+
+function saveProductsData() {
+  localStorage.setItem('gx-products', JSON.stringify(adminData.products));
+}
+
+// ── GALLERY SLOTS ──
+function renderGallerySlots() {
+  const c = document.getElementById('gallerySlots');
+  c.innerHTML = '';
+  for(let i=1;i<=6;i++) {
+    c.innerHTML += `
+      <div>
+        <div class="img-upload">
+          <input type="file" accept="image/*" onchange="previewMedia(this,'gal${i}','gal${i}up')">
+          <div class="img-upload-icon">📷</div>
+          <div class="img-upload-text">Photo ${i}</div>
+          <img id="gal${i}" class="img-preview">
+        </div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">photo${i}.jpg</div>
+      </div>`;
+  }
+}
+
+// ── PRODUCT PHOTO ──
+function previewProductPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = e.target.result;
+    document.getElementById('p-photo-data').value = data;
+    document.getElementById('p-photo-name').value = file.name;
+    document.getElementById('p-photo-preview').src = data;
+    document.getElementById('p-photo-preview').style.display = 'block';
+    document.getElementById('p-photo-placeholder').style.display = 'none';
+    document.getElementById('p-photo-filename').textContent = file.name;
+    document.getElementById('p-photo-icon').style.display = 'none';
+    document.getElementById('p-photo-text').textContent = '✓ Photo ready';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPhotoFields() {
+  document.getElementById('p-photo-data').value = '';
+  document.getElementById('p-photo-name').value = '';
+  document.getElementById('p-photo-preview').src = '';
+  document.getElementById('p-photo-preview').style.display = 'none';
+  document.getElementById('p-photo-placeholder').style.display = 'block';
+  document.getElementById('p-photo-filename').textContent = 'No photo';
+  document.getElementById('p-photo-icon').style.display = '';
+  document.getElementById('p-photo-text').textContent = 'Tap to upload photo';
+}
+
+
+function previewMedia(input, previewId, uploadId) {
+  const file = input.files[0];
+  if(!file) return;
+  const url = URL.createObjectURL(file);
+  const prev = document.getElementById(previewId);
+  if(prev) { prev.src=url; prev.style.display='block'; }
+  // Set filename hint
+  if(previewId==='heroPreview') document.getElementById('heroFilename').value = file.name;
+  if(previewId==='vidPreview') document.getElementById('vidFilename').value = file.name;
+}
+
+// ── COLORS ──
+function syncColor(colorId, hexId) {
+  document.getElementById(hexId).value = document.getElementById(colorId).value;
+  updateColorPreview();
+}
+function syncHex(hexId, colorId) {
+  const v = document.getElementById(hexId).value;
+  if(/^#[0-9a-f]{6}$/i.test(v)) { document.getElementById(colorId).value = v; updateColorPreview(); }
+}
+function updateColorPreview() {
+  const accent = document.getElementById('color-primary').value;
+  document.getElementById('prev-accent').style.color = accent;
+  document.getElementById('prev-btn').style.background = accent;
+}
+function saveColors() {
+  adminData.colors = {
+    primary: document.getElementById('color-primary').value,
+    bg: document.getElementById('color-bg').value,
+    text: document.getElementById('color-text').value,
+    card: document.getElementById('color-card').value,
+  };
+  localStorage.setItem('gx-colors', JSON.stringify(adminData.colors));
+  showAlert('color-alert');
+  logChange('Updated colors — accent: '+adminData.colors.primary);
+}
+
+// ── HOMEPAGE ──
+function loadHomepageFields() {
+  const d = adminData.homepage;
+  if(d.eyebrow) document.getElementById('hp-eyebrow').value = d.eyebrow;
+  if(d.title1) document.getElementById('hp-title1').value = d.title1;
+  if(d.title2) document.getElementById('hp-title2').value = d.title2;
+  if(d.subtitle) document.getElementById('hp-subtitle').value = d.subtitle;
+  if(d.btntext) document.getElementById('hp-btntext').value = d.btntext;
+}
+function saveHomepage() {
+  adminData.homepage = {
+    eyebrow: document.getElementById('hp-eyebrow').value,
+    title1: document.getElementById('hp-title1').value,
+    title2: document.getElementById('hp-title2').value,
+    subtitle: document.getElementById('hp-subtitle').value,
+    btntext: document.getElementById('hp-btntext').value,
+    mq: [1,2,3,4,5].map(i=>document.getElementById('mq'+i).value),
+    bn: [1,2,3].map(i=>({num:document.getElementById('bn'+i+'num').value,lbl:document.getElementById('bn'+i+'lbl').value})),
+    ftsub: document.getElementById('ft-sub').value,
+    ftcopy: document.getElementById('ft-copy').value,
+  };
+  localStorage.setItem('gx-homepage', JSON.stringify(adminData.homepage));
+  showAlert('hp-alert');
+  logChange('Updated homepage content');
+}
+
+// ── TEXT ──
+function saveText() {
+  const waNum = document.getElementById('wa-number').value.trim();
+  if(waNum) { localStorage.setItem('gx-wa', waNum); logChange('Updated WhatsApp: '+waNum); }
+  localStorage.setItem('gx-storetext', JSON.stringify({
+    newtitle: document.getElementById('st-newtitle').value,
+    mentitle: document.getElementById('st-mentitle').value,
+    womentitle: document.getElementById('st-womentitle').value,
+    herotag: document.getElementById('st-herotag').value,
+    hero1: document.getElementById('st-hero1').value,
+    hero2: document.getElementById('st-hero2').value,
+    hero3: document.getElementById('st-hero3').value,
+    herosub: document.getElementById('st-herosub').value,
+  }));
+  showAlert('text-alert');
+  logChange('Updated store text labels');
+}
+
+// ── PASSWORD ──
+function changePassword() {
+  const u = document.getElementById('new-user').value.trim();
+  const p = document.getElementById('new-pass').value.trim();
+  if(!u||!p) return alert('Fill both fields');
+  adminData.user = u; adminData.pass = p;
+  localStorage.setItem('gx-user', u);
+  localStorage.setItem('gx-pass', p);
+  showAlert('pass-alert');
+}
+
+// ── EXPORT / DOWNLOAD ──
+function generateProductsJS() {
+  return `const products = ${JSON.stringify(adminData.products, null, 2)};`;
+}
+
+function applyColorsToHTML(html) {
+  if(!adminData.colors.primary) return html;
+  const c = adminData.colors;
+  // Replace CSS variables
+  html = html.replace(/--red:\s*#[0-9a-f]{6}/gi, `--red: ${c.primary}`);
+  html = html.replace(/--gold:\s*#[0-9a-f]{6}/gi, `--gold: ${c.primary}`);
+  html = html.replace(/--black:\s*#[0-9a-f]{6}/gi, `--black: ${c.bg}`);
+  return html;
+}
+
+function applyHomepageToHTML(html) {
+  const d = adminData.homepage;
+  if(!d.eyebrow) return html;
+  html = html.replace(/SS 2026 — New Collection/g, d.eyebrow);
+  html = html.replace(/Luxury Menswear &amp; Womenswear<\/p>\s*<a href="store\.html"/,
+    `${d.subtitle}</p>\n    <a href="store.html"`);
+  if(d.ftsub) html = html.replace(/Luxury Menswear &amp; Womenswear<\/p>\s*<a href="store\.html" class="shop-now"/,
+    `${d.ftsub}</p>\n  <a href="store.html" class="shop-now"`);
+  return html;
+}
+
+function applyWAToHTML(html) {
+  const wa = localStorage.getItem('gx-wa');
+  if(wa) html = html.replace(/YOUR_PHONE/g, wa);
+  return html;
+}
+
+function applyProductsToHTML(html) {
+  const newJS = generateProductsJS();
+  // Replace the products array in store.html
+  html = html.replace(/const products = \[[\s\S]*?\];/, newJS);
+  return html;
+}
+
+async function downloadIndex() {
+  try {
+    const r = await fetch('index.html');
+    let html = await r.text();
+    html = applyColorsToHTML(html);
+    html = applyHomepageToHTML(html);
+    downloadFile(html, 'index.html');
+    logChange('Downloaded index.html');
+  } catch(e) {
+    // Fallback: just notify user
+    alert('To download: right-click this page → Save As → "admin.html", then edit index.html manually based on your saved settings.');
+  }
+}
+
+async function downloadStore() {
+  try {
+    const r = await fetch('store.html');
+    let html = await r.text();
+    html = applyColorsToHTML(html);
+    html = applyWAToHTML(html);
+    html = applyProductsToHTML(html);
+    downloadFile(html, 'store.html');
+    logChange('Downloaded store.html');
+  } catch(e) {
+    alert('To download: right-click → Save As, then update manually based on your saved settings.');
+  }
+}
+
+function downloadFile(content, filename) {
+  const a = document.createElement('a');
+  a.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(content);
+  a.download = filename;
+  a.click();
+}
+
+// ── HELPERS ──
+function showAlert(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  setTimeout(()=>el.style.display='none', 3000);
+}
+
+function logChange(msg) {
+  const now = new Date().toLocaleTimeString();
+  adminData.changelog.unshift(`[${now}] ${msg}`);
+  const el = document.getElementById('changeLog');
+  if(el) el.innerHTML = adminData.changelog.slice(0,10).map(c=>`<div>• ${c}</div>`).join('');
+}
+</script>
+</body>
+</html>
