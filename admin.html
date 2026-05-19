@@ -766,57 +766,54 @@ body {
     <div class="page" id="page-export">
       <div class="page-header">
         <div>
-          <div class="page-title">Save & Export</div>
-          <div class="page-sub">Download your updated files</div>
+          <div class="page-title">Publish Changes</div>
+          <div class="page-sub">Push your changes live in one command</div>
         </div>
       </div>
 
-      <div class="instructions">
-        <p>
-          <strong>How to publish your changes:</strong><br>
-          1. Click the download buttons below to get your updated files<br>
-          2. Move the downloaded files into your <strong>~/goxeno</strong> folder (replace old ones)<br>
-          3. Open Termux and run these commands:
+      <div class="card" style="border-color:var(--red);">
+        <div class="card-title">⚡ One Command to Go Live</div>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.8;">
+          Copy this command, open Termux, paste it and press Enter. Your site updates in seconds!
         </p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Termux Commands to Publish</div>
-        <div class="code-box">cd ~/goxeno
-git add .
-git commit -m "update site"
-git push</div>
-        <p style="font-size:11px;color:var(--muted);margin-top:12px;">Your live site updates automatically in ~30 seconds after pushing.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Download Files</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--dark3);border:1px solid var(--border);">
-            <div>
-              <div style="font-size:13px;">index.html</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px;">Homepage — with your text edits</div>
-            </div>
-            <button class="btn btn-red btn-sm" onclick="downloadIndex()">Download</button>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--dark3);border:1px solid var(--border);">
-            <div>
-              <div style="font-size:13px;">store.html</div>
-              <div style="font-size:10px;color:var(--muted);margin-top:2px;">Store — with your product & color edits</div>
-            </div>
-            <button class="btn btn-red btn-sm" onclick="downloadStore()">Download</button>
-          </div>
+        <div style="background:#050505;border:1px solid var(--border);padding:16px;font-family:monospace;font-size:13px;color:#aaa;letter-spacing:0.5px;line-height:2;position:relative;">
+          <span id="publishCmd">cd ~/goxeno && netlify deploy --prod</span>
+          <button onclick="copyCommand()" style="position:absolute;top:8px;right:8px;background:var(--red);border:none;color:#fff;padding:6px 14px;font-size:10px;letter-spacing:2px;cursor:pointer;" id="copyBtn">COPY</button>
         </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:12px;">Open Termux → paste → Enter → done! 🔥</p>
       </div>
 
       <div class="card">
-        <div class="card-title">Changes Made This Session</div>
-        <div id="changeLog" style="font-size:12px;color:var(--muted);line-height:2;">No changes yet.</div>
+        <div class="card-title">What Gets Updated</div>
+        <div id="changeLog" style="font-size:12px;color:var(--muted);line-height:2.2;">No changes yet — make some edits first!</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Download Files (optional)</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:16px;">Only needed if you want a backup copy on your phone.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="downloadIndex()">⬇ index.html</button>
+          <button class="btn btn-outline btn-sm" onclick="downloadStore()">⬇ store.html</button>
+        </div>
       </div>
     </div>
 
   </div><!-- end main -->
 </div><!-- end admin wrap -->
+
+<!-- ── PUBLISH TOAST ── -->
+<div id="publishToast" style="
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--dark2);border:1px solid var(--red);
+  padding:16px 24px;z-index:9999;transition:transform .4s;
+  display:flex;flex-direction:column;gap:10px;min-width:280px;max-width:90vw;
+">
+  <div style="font-size:10px;letter-spacing:2px;color:var(--red);text-transform:uppercase;">Changes Saved!</div>
+  <div style="font-size:12px;color:var(--muted);">Copy this command and run in Termux to go live:</div>
+  <div style="background:#050505;padding:10px;font-family:monospace;font-size:12px;color:#aaa;">cd ~/goxeno && netlify deploy --prod</div>
+  <button onclick="copyAndClose()" style="background:var(--red);border:none;color:#fff;padding:10px;font-size:11px;letter-spacing:3px;cursor:pointer;text-transform:uppercase;">📋 Copy Command</button>
+  <button onclick="closeToast()" style="background:none;border:1px solid #333;color:var(--muted);padding:8px;font-size:10px;cursor:pointer;">Dismiss</button>
+</div>
 
 <!-- Product Modal -->
 <div class="modal-bg" id="productModal">
@@ -1060,6 +1057,7 @@ function saveProduct() {
   renderProducts();
   renderDashboard();
   closeProductModal();
+  showPublishToast();
 }
 
 function deleteProduct(id) {
@@ -1162,8 +1160,11 @@ function saveColors() {
     card: document.getElementById('color-card').value,
   };
   localStorage.setItem('gx-colors', JSON.stringify(adminData.colors));
-  showAlert('color-alert');
   logChange('Updated colors — accent: '+adminData.colors.primary);
+  const btn = document.querySelector('#page-colors .btn-red');
+  btn.textContent = '✓ Saved!'; btn.style.background = '#22c55e';
+  setTimeout(()=>{ btn.textContent = 'Save Color Changes'; btn.style.background = ''; }, 2500);
+  showPublishToast();
 }
 
 // ── HOMEPAGE ──
@@ -1176,20 +1177,36 @@ function loadHomepageFields() {
   if(d.btntext) document.getElementById('hp-btntext').value = d.btntext;
 }
 function saveHomepage() {
-  adminData.homepage = {
-    eyebrow: document.getElementById('hp-eyebrow').value,
-    title1: document.getElementById('hp-title1').value,
-    title2: document.getElementById('hp-title2').value,
-    subtitle: document.getElementById('hp-subtitle').value,
-    btntext: document.getElementById('hp-btntext').value,
-    mq: [1,2,3,4,5].map(i=>document.getElementById('mq'+i).value),
-    bn: [1,2,3].map(i=>({num:document.getElementById('bn'+i+'num').value,lbl:document.getElementById('bn'+i+'lbl').value})),
-    ftsub: document.getElementById('ft-sub').value,
-    ftcopy: document.getElementById('ft-copy').value,
-  };
-  localStorage.setItem('gx-homepage', JSON.stringify(adminData.homepage));
-  showAlert('hp-alert');
-  logChange('Updated homepage content');
+  try {
+    adminData.homepage = {
+      eyebrow: document.getElementById('hp-eyebrow').value,
+      title1: document.getElementById('hp-title1').value,
+      title2: document.getElementById('hp-title2').value,
+      subtitle: document.getElementById('hp-subtitle').value,
+      btntext: document.getElementById('hp-btntext').value,
+      mq: [1,2,3,4,5].map(i=>document.getElementById('mq'+i).value),
+      bn: [1,2,3].map(i=>({num:document.getElementById('bn'+i+'num').value,lbl:document.getElementById('bn'+i+'lbl').value})),
+      ftsub: document.getElementById('ft-sub').value,
+      ftcopy: document.getElementById('ft-copy').value,
+    };
+    localStorage.setItem('gx-homepage', JSON.stringify(adminData.homepage));
+    logChange('Updated homepage content');
+    // Show visible feedback
+    const btn = document.querySelector('#page-homepage .btn-red');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Saved!';
+    btn.style.background = '#22c55e';
+    setTimeout(()=>{ btn.textContent = orig; btn.style.background = ''; }, 2500);
+    // Scroll alert into view
+    const alert = document.getElementById('hp-alert');
+    alert.style.display = 'block';
+    alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(()=>alert.style.display='none', 3000);
+    // Show publish toast
+    showPublishToast();
+  } catch(e) {
+    alert('Error saving: ' + e.message);
+  }
 }
 
 // ── TEXT ──
@@ -1206,8 +1223,11 @@ function saveText() {
     hero3: document.getElementById('st-hero3').value,
     herosub: document.getElementById('st-herosub').value,
   }));
-  showAlert('text-alert');
   logChange('Updated store text labels');
+  const btn = document.querySelector('#page-text .btn-red');
+  btn.textContent = '✓ Saved!'; btn.style.background = '#22c55e';
+  setTimeout(()=>{ btn.textContent = 'Save Text Changes'; btn.style.background = ''; }, 2500);
+  showPublishToast();
 }
 
 // ── PASSWORD ──
@@ -1295,7 +1315,45 @@ function downloadFile(content, filename) {
   a.click();
 }
 
-// ── HELPERS ──
+// ── PUBLISH TOAST ──
+function showPublishToast() {
+  const t = document.getElementById('publishToast');
+  t.style.transform = 'translateX(-50%) translateY(0)';
+}
+function closeToast() {
+  document.getElementById('publishToast').style.transform = 'translateX(-50%) translateY(200px)';
+}
+function copyCommand() {
+  navigator.clipboard.writeText('cd ~/goxeno && netlify deploy --prod').then(()=>{
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ COPIED!'; btn.style.background = '#22c55e';
+    setTimeout(()=>{ btn.textContent = 'COPY'; btn.style.background = 'var(--red)'; }, 2000);
+  }).catch(()=>{
+    // fallback for older browsers
+    const el = document.createElement('textarea');
+    el.value = 'cd ~/goxeno && netlify deploy --prod';
+    document.body.appendChild(el); el.select(); document.execCommand('copy');
+    document.body.removeChild(el);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ COPIED!'; btn.style.background = '#22c55e';
+    setTimeout(()=>{ btn.textContent = 'COPY'; btn.style.background = 'var(--red)'; }, 2000);
+  });
+}
+function copyAndClose() {
+  navigator.clipboard.writeText('cd ~/goxeno && netlify deploy --prod').then(()=>{
+    closeToast();
+    alert('✓ Copied! Open Termux and paste it.');
+  }).catch(()=>{
+    const el = document.createElement('textarea');
+    el.value = 'cd ~/goxeno && netlify deploy --prod';
+    document.body.appendChild(el); el.select(); document.execCommand('copy');
+    document.body.removeChild(el);
+    closeToast();
+    alert('✓ Copied! Open Termux and paste it.');
+  });
+}
+
+
 function showAlert(id) {
   const el = document.getElementById(id);
   el.style.display = 'block';
