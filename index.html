@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GO XENO</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow-x: hidden; }
+
+:root {
+  --red: #cc0000;
+  --red-light: #ff2222;
+  --black: #080808;
+  --dark: #111;
+  --white: #f5eeee;
+  --text: #e8dada;
+  --muted: #886666;
+}
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+  cursor: none;
+}
+
+/* CURSOR */
+.cur { position: fixed; pointer-events: none; z-index: 9999; border-radius: 50%; transform: translate(-50%,-50%); transition: width .3s, height .3s, background .3s; }
+#cur1 { width: 10px; height: 10px; background: var(--red); }
+#cur2 { width: 38px; height: 38px; border: 1px solid rgba(204,0,0,0.5); background: none; transition: all .15s ease-out; }
+
+/* ── NAVBAR ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 28px;
+  background: rgba(8,8,8,0.92);
+  border-bottom: 1px solid rgba(204,0,0,0.15);
+  backdrop-filter: blur(12px);
+}
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; letter-spacing: 6px;
+  color: var(--white); text-decoration: none; font-weight: 300;
+}
+.logo b { color: var(--red); font-weight: 400; }
+.nav-tag {
+  font-size: 9px; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase;
+}
+
+/* ── HERO SECTION ── */
+.hero {
+  position: relative;
+  width: 100%; min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  padding-top: 60px;
+}
+
+/* Media background */
+.hero-media {
+  position: absolute; inset: 0;
+  z-index: 0;
+}
+.hero-media video,
+.hero-media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: none;
+}
+.hero-media video.active,
+.hero-media img.active { display: block; }
+
+/* Placeholder bg when no media */
+.hero-placeholder {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 60% 40%, rgba(204,0,0,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 70%, rgba(180,0,0,0.1) 0%, transparent 50%),
+    linear-gradient(160deg, #0e0505 0%, #080808 60%, #0a0303 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.placeholder-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(204,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(204,0,0,0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+.placeholder-slots {
+  position: absolute; inset: 0;
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px;
+  opacity: 0.18;
+}
+.pslot {
+  background: linear-gradient(160deg, #1a0808, #0d0404);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; letter-spacing: 3px; color: #3a1010;
+  text-transform: uppercase;
+}
+
+/* Dark overlay on media */
+.hero-overlay {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(8,8,8,0.3) 0%,
+    rgba(8,8,8,0.15) 40%,
+    rgba(8,8,8,0.6) 80%,
+    rgba(8,8,8,0.95) 100%
+  );
+}
+
+/* Hero content */
+.hero-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  padding: 0 20px;
+  animation: fadeUp 1.2s ease forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-eyebrow {
+  font-size: 10px; letter-spacing: 6px;
+  color: var(--red); text-transform: uppercase;
+  margin-bottom: 24px;
+  animation: fadeUp 1s .2s both;
+}
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(64px, 14vw, 160px);
+  font-weight: 300; line-height: 0.85;
+  color: var(--white);
+  letter-spacing: -2px;
+  animation: fadeUp 1s .3s both;
+}
+.hero-title em { font-style: italic; color: var(--red); }
+.hero-subtitle {
+  margin-top: 28px;
+  font-size: 12px; letter-spacing: 4px;
+  color: var(--muted); text-transform: uppercase;
+  animation: fadeUp 1s .5s both;
+}
+
+/* SHOP NOW BUTTON */
+.shop-now {
+  display: inline-flex; align-items: center; gap: 14px;
+  margin-top: 48px;
+  padding: 20px 56px;
+  background: var(--red);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px; font-weight: 500; letter-spacing: 5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none; cursor: none;
+  position: relative; overflow: hidden;
+  animation: fadeUp 1s .7s both;
+  transition: background .3s, transform .2s;
+}
+.shop-now::before {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left .5s;
+}
+.shop-now:hover::before { left: 100%; }
+.shop-now:hover { background: var(--red-light); transform: scale(1.02); }
+.shop-now-arrow { font-size: 18px; transition: transform .3s; }
+.shop-now:hover .shop-now-arrow { transform: translateX(6px); }
+
+/* Scroll indicator */
+.hero-scroll {
+  position: absolute; bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  animation: fadeUp 1s 1s both;
+}
+.scroll-dot {
+  width: 1px; height: 50px;
+  background: linear-gradient(to bottom, var(--red), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse {
+  0%,100% { opacity:1; transform: scaleY(1); }
+  50%      { opacity:0.3; transform: scaleY(0.5); }
+}
+.hero-scroll span {
+  font-size: 8px; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase;
+}
+
+/* ── GALLERY SECTION ── */
+.upload-section {
+  position: relative; z-index: 10;
+  padding: 80px 28px 60px;
+  background: var(--dark);
+  border-top: 1px solid #1a1a1a;
+}
+.section-label {
+  font-size: 9px; letter-spacing: 5px;
+  color: var(--red); text-transform: uppercase; margin-bottom: 10px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 5vw, 42px); font-weight: 300;
+  color: var(--white); margin-bottom: 40px;
+}
+
+/* Static gallery grid (works on Netlify) */
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 3px; margin-bottom: 16px;
+}
+.gallery-slot {
+  aspect-ratio: 3/4;
+  background: #0f0f0f;
+  border: 1px dashed #2a1a1a;
+  position: relative; overflow: hidden;
+  transition: border-color .3s;
+}
+.gallery-slot img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+.gallery-slot.empty img { display: none; }
+.gallery-slot .empty-label {
+  display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; height: 100%;
+}
+.gallery-slot.empty .empty-label { display: flex; }
+.upload-icon { font-size: 28px; opacity: 0.4; }
+.upload-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; text-align: center; }
+
+.upload-hint {
+  font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-top: 10px;
+}
+.upload-hint code {
+  font-family: monospace; color: var(--red); font-size: 11px;
+}
+
+/* ── BRAND STRIP ── */
+.brand-strip {
+  padding: 50px 28px;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: #111;
+  border-top: 1px solid #1a1a1a;
+  border-bottom: 1px solid #1a1a1a;
+}
+.strip-item {
+  padding: 32px 20px; text-align: center;
+  background: var(--black);
+}
+.strip-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px; font-weight: 300;
+  color: var(--red); line-height: 1;
+}
+.strip-label {
+  font-size: 9px; letter-spacing: 3px;
+  color: var(--muted); text-transform: uppercase; margin-top: 6px;
+}
+
+/* ── FEATURED SECTION ── */
+.featured {
+  padding: 80px 28px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+.feat-main {
+  background: #0f0f0f;
+  aspect-ratio: 2/3;
+  position: relative; overflow: hidden;
+  display: flex; align-items: flex-end;
+}
+.feat-side {
+  display: grid; grid-template-rows: 1fr 1fr; gap: 2px;
+}
+.feat-item {
+  background: #0f0f0f;
+  position: relative; overflow: hidden;
+  display: flex; align-items: flex-end;
+  min-height: 200px;
+}
+.feat-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(8,8,8,0.9), transparent);
+}
+.feat-tag { font-size: 8px; letter-spacing: 3px; color: var(--red); text-transform: uppercase; }
+.feat-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; color: var(--white); font-weight: 300;
+}
+.feat-upload {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px;
+}
+.feat-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.feat-upload-icon { font-size: 24px; opacity: 0.2; }
+.feat-upload-text { font-size: 8px; letter-spacing: 2px; color: #333; text-transform: uppercase; }
+.feat-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+
+/* ── MARQUEE ── */
+.marquee {
+  overflow: hidden; padding: 18px 0;
+  background: var(--red);
+  border-top: none; border-bottom: none;
+}
+.marquee-track {
+  display: flex; white-space: nowrap;
+  animation: marqueeAnim 18s linear infinite;
+}
+.marquee-item {
+  display: inline-flex; align-items: center; gap: 24px;
+  padding-right: 24px;
+  font-size: 12px; letter-spacing: 4px;
+  color: rgba(255,255,255,0.9); text-transform: uppercase;
+  font-weight: 300;
+}
+.marquee-dot { width: 4px; height: 4px; background: rgba(255,255,255,0.5); border-radius: 50%; }
+@keyframes marqueeAnim { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ── VIDEO HERO UPLOAD ── */
+.video-section {
+  padding: 80px 28px;
+  background: var(--dark);
+  border-top: 1px solid #1a1a1a;
+}
+.video-upload-area {
+  aspect-ratio: 16/9;
+  max-height: 520px;
+  background: #0c0c0c;
+  border: 1px dashed #2a1a1a;
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+  transition: border-color .3s;
+}
+.video-upload-area:hover { border-color: var(--red); }
+.video-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.video-upload-area video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+.video-icon { font-size: 48px; opacity: 0.2; }
+.video-text { font-size: 11px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; }
+.video-sub { font-size: 10px; color: #333; letter-spacing: 1px; }
+.video-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(8,8,8,0.8) 100%);
+  display: none; align-items: flex-end; padding: 32px;
+}
+.video-overlay.visible { display: flex; }
+.video-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; font-weight: 300; color: var(--white);
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 50px 28px 30px;
+  border-top: 1px solid #1a1a1a;
+  text-align: center;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px; letter-spacing: 8px;
+  color: var(--white); font-weight: 300;
+  display: block; margin-bottom: 12px;
+}
+.footer-logo b { color: var(--red); }
+.footer-sub { font-size: 10px; letter-spacing: 3px; color: var(--muted); margin-bottom: 30px; }
+.footer-copy { font-size: 10px; color: #333; letter-spacing: 1px; margin-top: 30px; }
+
+/* MOBILE */
+@media (max-width: 640px) {
+  .featured { grid-template-columns: 1fr; padding: 40px 16px; }
+  .feat-main { aspect-ratio: 3/4; }
+  .brand-strip { grid-template-columns: 1fr; }
+  .upload-grid { grid-template-columns: repeat(2, 1fr); }
+  .upload-section, .video-section { padding: 50px 16px; }
+  nav { padding: 14px 16px; }
+  .hero-title { letter-spacing: -1px; }
+  .shop-now { padding: 16px 36px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur1"></div>
+<div class="cur" id="cur2"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="logo">GO <b>XENO</b></a>
+  <span class="nav-tag">Luxury Fashion</span>
+  <a href="store.html" class="shop-now" style="padding:10px 24px;font-size:10px;margin:0;animation:none;">Shop Now →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="heroSection">
+
+  <!-- Background media (set by clicking "Set as Hero") -->
+  <div class="hero-media" id="heroMedia">
+    <img id="heroImg" src="" alt="">
+    <video id="heroVid" autoplay muted loop playsinline></video>
+  </div>
+
+  <!-- Default placeholder -->
+  <div class="hero-placeholder" id="heroPlaceholder">
+    <div class="placeholder-grid"></div>
+    <div class="placeholder-slots">
+      <div class="pslot">Your Photo</div>
+      <div class="pslot">Your Photo</div>
+      <div class="pslot">Your Photo</div>
+    </div>
+  </div>
+
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">SS 2026 — New Collection</p>
+    <h1 class="hero-title">GO<br><em>XENO</em></h1>
+    <p class="hero-subtitle">Luxury Menswear & Womenswear</p>
+    <a href="store.html" class="shop-now">
+      Shop Now <span class="shop-now-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-dot"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee-track">
+    <div class="marquee-item"><span>New Arrivals 2026</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Free Shipping Over ₹3000</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Premium Quality</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Men & Women</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Limited Edition</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>New Arrivals 2026</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Free Shipping Over ₹3000</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Premium Quality</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Men & Women</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Limited Edition</span><div class="marquee-dot"></div></div>
+  </div>
+</div>
+
+<!-- BRAND NUMBERS -->
+<div class="brand-strip">
+  <div class="strip-item">
+    <div class="strip-number">500+</div>
+    <div class="strip-label">Products</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-number">10K+</div>
+    <div class="strip-label">Happy Customers</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-number">100%</div>
+    <div class="strip-label">Premium Quality</div>
+  </div>
+</div>
+
+<!-- PHOTO GALLERY SECTION -->
+<div class="upload-section">
+  <p class="section-label">Collection Photos</p>
+  <h2 class="section-title">Our Collection</h2>
+
+  <div class="upload-grid" id="uploadGrid">
+    <!--
+      TO ADD YOUR PHOTOS:
+      Replace the src="" in each <img> below with your image filename.
+      Upload your images to the same folder as this file on Netlify.
+      Example: src="photo1.jpg"
+    -->
+    <div class="gallery-slot">
+      <img src="" alt="Collection Photo 1" onerror="this.parentElement.classList.add('empty')">
+      <div class="empty-label"><span class="upload-icon">📷</span><span class="upload-label">Add src="your-photo.jpg"</span></div>
+    </div>
+    <div class="gallery-slot">
+      <img src="" alt="Collection Photo 2" onerror="this.parentElement.classList.add('empty')">
+      <div class="empty-label"><span class="upload-icon">📷</span><span class="upload-label">Add src="your-photo.jpg"</span></div>
+    </div>
+    <div class="gallery-slot">
+      <img src="" alt="Collection Photo 3" onerror="this.parentElement.classList.add('empty')">
+      <div class="empty-label"><span class="upload-icon">📷</span><span class="upload-label">Add src="your-photo.jpg"</span></div>
+    </div>
+    <div class="gallery-slot">
+      <img src="" alt="Collection Photo 4" onerror="this.parentElement.classList.add('empty')">
+      <div class="empty-label"><span class="upload-icon">📷</span><span class="upload-label">Add src="your-photo.jpg"</span></div>
+    </div>
+    <div class="gallery-slot">
+      <img src="" alt="Collection Photo 5" onerror="this.parentElement.classList.add('empty')">
+      <div class="empty-label"><span class="upload-icon">📷</span><span class="upload-label">Add src="your-photo.jpg"</span></div>
+    </div>
+    <div class="gallery-slot">
+      <img src="" alt="Collection Photo 6" onerror="this.parentElement.classList.add('empty')">
+      <div class="empty-label"><span class="upload-icon">📷</span><span class="upload-label">Add src="your-photo.jpg"</span></div>
+    </div>
+  </div>
+  <p class="upload-hint">💡 To add photos: put your image files in the same folder, then edit this HTML and set <code>src="your-filename.jpg"</code> on each slot above.</p>
+</div>
+
+<!-- FEATURED LOOKBOOK -->
+<!-- TO ADD PHOTOS: Replace src="" with your image filenames and upload them to Netlify -->
+<section style="padding: 0 0 2px; background: var(--black);">
+  <div class="featured">
+    <div class="feat-main">
+      <!-- Main feature: set src="your-image.jpg" -->
+      <img id="featMainImg" class="feat-img" src="" alt="Main Feature" onerror="this.style.display='none'">
+      <div class="feat-upload" id="featMainPlaceholder">
+        <div class="feat-upload-icon">📸</div>
+        <div class="feat-upload-text">Edit HTML: set src="look1.jpg"</div>
+      </div>
+      <div class="feat-label">
+        <div class="feat-tag">Featured Look</div>
+        <div class="feat-name">Go Xeno Signature</div>
+      </div>
+    </div>
+    <div class="feat-side">
+      <div class="feat-item">
+        <!-- Look 2: set src="your-image.jpg" -->
+        <img id="featImgA" class="feat-img" src="" alt="Look 2" onerror="this.style.display='none'">
+        <div class="feat-upload" id="featAPlaceholder">
+          <div class="feat-upload-icon">📸</div>
+          <div class="feat-upload-text">Edit HTML: set src="look2.jpg"</div>
+        </div>
+        <div class="feat-label">
+          <div class="feat-tag">Men's Edit</div>
+          <div class="feat-name">Urban Noir</div>
+        </div>
+      </div>
+      <div class="feat-item">
+        <!-- Look 3: set src="your-image.jpg" -->
+        <img id="featImgB" class="feat-img" src="" alt="Look 3" onerror="this.style.display='none'">
+        <div class="feat-upload" id="featBPlaceholder">
+          <div class="feat-upload-icon">📸</div>
+          <div class="feat-upload-text">Edit HTML: set src="look3.jpg"</div>
+        </div>
+        <div class="feat-label">
+          <div class="feat-tag">Women's Edit</div>
+          <div class="feat-name">Midnight Luxe</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO SECTION -->
+<div class="video-section">
+  <p class="section-label">Brand Video</p>
+  <h2 class="section-title">Your Story</h2>
+  <!-- BRAND VIDEO: Upload your video file to Netlify and set src="your-video.mp4" below -->
+  <div class="video-upload-area" id="videoArea">
+    <div class="video-icon" id="videoIcon">🎬</div>
+    <div class="video-text" id="videoText">Add your brand video</div>
+    <div class="video-sub" id="videoSub">Edit HTML: add src="your-video.mp4" to the &lt;video&gt; tag below</div>
+    <!-- Replace src="" with your video filename, e.g. src="brand.mp4" -->
+    <video id="brandVideo" autoplay muted loop playsinline src="" onerror="this.style.display='none'"></video>
+    <div class="video-overlay" id="videoOverlay">
+      <div class="video-title">Go <em style="color:var(--red)">Xeno</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- BIG SHOP NOW CTA -->
+<section style="padding: 100px 28px; text-align: center; background: var(--dark); border-top: 1px solid #1a1a1a;">
+  <p style="font-size:9px;letter-spacing:5px;color:var(--red);text-transform:uppercase;margin-bottom:20px;">Ready to Shop?</p>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,7vw,80px);font-weight:300;color:var(--white);margin-bottom:40px;line-height:1.1;">
+    Discover the<br><em style="color:var(--red)">Full Collection</em>
+  </h2>
+  <a href="store.html" class="shop-now" style="animation:none;font-size:13px;padding:22px 64px;">
+    Shop Now <span class="shop-now-arrow">→</span>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">GO <b>XENO</b></span>
+  <p class="footer-sub">Luxury Menswear & Womenswear</p>
+  <a href="store.html" class="shop-now" style="animation:none;display:inline-flex;">Enter Store →</a>
+  <p class="footer-copy">© 2026 Go Xeno. All rights reserved.</p>
+</footer>
+
+<script>
+// ── CURSOR ──
+const c1 = document.getElementById('cur1');
+const c2 = document.getElementById('cur2');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => {
+  mx=e.clientX; my=e.clientY;
+  c1.style.left=mx+'px'; c1.style.top=my+'px';
+});
+(function tick(){ rx+=(mx-rx)*.12; ry+=(my-ry)*.12; c2.style.left=rx+'px'; c2.style.top=ry+'px'; requestAnimationFrame(tick); })();
+
+// ── STATIC IMAGE DISPLAY ──
+// Show featured images if src is set; hide placeholder
+['featMainImg','featImgA','featImgB'].forEach(id => {
+  const img = document.getElementById(id);
+  if (img && img.src && img.src !== window.location.href) {
+    img.style.display = 'block';
+    const placeholder = img.nextElementSibling;
+    if (placeholder && placeholder.classList.contains('feat-upload')) {
+      placeholder.style.display = 'none';
+    }
+  }
+});
+
+// Show hero image/video if src is set
+const heroImg = document.getElementById('heroImg');
+const heroVid = document.getElementById('heroVid');
+const heroPlaceholder = document.getElementById('heroPlaceholder');
+if (heroImg && heroImg.src && heroImg.src !== window.location.href) {
+  heroImg.classList.add('active');
+  if (heroPlaceholder) heroPlaceholder.style.display = 'none';
+} else if (heroVid && heroVid.src && heroVid.src !== window.location.href) {
+  heroVid.classList.add('active');
+  if (heroPlaceholder) heroPlaceholder.style.display = 'none';
+}
+
+// Show brand video overlay if video src is set
+const brandVid = document.getElementById('brandVideo');
+if (brandVid && brandVid.src && brandVid.src !== window.location.href) {
+  brandVid.style.display = 'block';
+  document.getElementById('videoIcon').style.display = 'none';
+  document.getElementById('videoText').style.display = 'none';
+  document.getElementById('videoSub').style.display = 'none';
+  document.getElementById('videoOverlay').classList.add('visible');
+}
+
+// Mark gallery slots as empty if no real src
+document.querySelectorAll('.gallery-slot img').forEach(img => {
+  if (!img.src || img.src === window.location.href) {
+    img.parentElement.classList.add('empty');
+  }
+});
+</script>
+</body>
+</html>
